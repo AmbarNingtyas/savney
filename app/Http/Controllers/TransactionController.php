@@ -7,28 +7,37 @@ use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
-    public function store(Request $request) {
-        $request->validate([
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
             'amount' => 'required|numeric',
             'description' => 'required|string',
-            'type' => 'required|in:income,expense',
             'category' => 'required|string',
-            'date' => 'required|date',
+            'type' => 'required|in:income,expense',
+            'date' => 'required|date'
         ]);
-    
-        $transaction = Transaction::create([
-            'user_id' => auth()->id(),
-            'amount' => $request->amount,
-            'description' => $request->description,
-            'type' => $request->type,
-            'category' => $request->category,
-            'date' => $request->date,
-        ]);
-    
-        return response()->json([
-            'status' => 'success',
-            'data' => $transaction,
-            'message' => 'Transaksi berhasil dibuat'
-        ], 201);
+
+        $transaction = $request->user()->transactions()->create($validated);
+
+        return response()->json($transaction, 201);
+    }
+
+    public function index(Request $request)
+    {
+        $transactions = $request->user()->transactions()
+            ->orderBy('date', 'desc')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'amount' => 'Rp' . number_format($item->amount, 0, ',', '.'),
+                    'description' => $item->description,
+                    'category' => $item->category,
+                    'type' => $item->type,
+                    'date' => date('Y-m-d', strtotime($item->date)),
+                ];
+            });
+
+        return response()->json($transactions);;
     }
 }

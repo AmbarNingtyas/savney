@@ -12,4 +12,9 @@ class Investment extends Model
         'monthly_interest', 
         'target_amount'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

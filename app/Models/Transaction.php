@@ -14,4 +14,10 @@ class Transaction extends Model
         'category', 
         'date'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    
 }

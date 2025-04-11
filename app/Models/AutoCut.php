@@ -11,7 +11,12 @@ class AutoCut extends Model
         'amount', 
         'description', 
         'category', 
-        'deduction_date', 
-        'frequency'
+        'deduction_date'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    
 }
